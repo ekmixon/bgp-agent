@@ -37,10 +37,10 @@ from lib.exabgp import ExaBGPContainer
 def community_exists(path, com):
     a, b = com.split(':')
     com = (int(a) << 16) + int(b)
-    for a in path['attrs']:
-        if a['type'] == BGP_ATTR_TYPE_COMMUNITIES and com in a['communities']:
-            return True
-    return False
+    return any(
+        a['type'] == BGP_ATTR_TYPE_COMMUNITIES and com in a['communities']
+        for a in path['attrs']
+    )
 
 
 class GoBGPTestBase(unittest.TestCase):

@@ -104,11 +104,7 @@ class QuaggaBGPContainer(BGPContainer):
         else:
             raise Exception('unknown output format {0}'.format(lines))
 
-        if lines[0] == 'Local':
-            aspath = []
-        else:
-            aspath = [int(asn) for asn in lines[0].split()]
-
+        aspath = [] if lines[0] == 'Local' else [int(asn) for asn in lines[0].split()]
         nexthop = lines[1].split()[0].strip()
         info = [s.strip(',') for s in lines[2].split()]
         attrs = []

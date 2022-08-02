@@ -243,7 +243,7 @@ class ZebraNHTTest(unittest.TestCase):
                 capture=True)
 
         ifname = get_ifname_with_prefix('192.168.23.3/24', f=self.r3.local)
-        self.r3.local('ip link set %s down' % ifname)
+        self.r3.local(f'ip link set {ifname} down')
 
         wait_for(f=_f_r2)
         wait_for(f=_f_r1)
@@ -276,7 +276,7 @@ class ZebraNHTTest(unittest.TestCase):
                 capture=True)
 
         ifname = get_ifname_with_prefix('192.168.23.3/24', f=self.r3.local)
-        self.r3.local('ip link set %s up' % ifname)
+        self.r3.local(f'ip link set {ifname} up')
 
         wait_for(f=_f_r2)
         wait_for(f=_f_r1)

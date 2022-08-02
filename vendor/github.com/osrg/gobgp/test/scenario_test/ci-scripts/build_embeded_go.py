@@ -7,7 +7,7 @@ def cut(filename, out):
     with open(filename, 'r') as f:
         flag = False
         codes = []
-        for line in f.readlines():
+        for line in f:
             if line.strip() == '```go':
                 flag = True
             elif line.strip() == '```':

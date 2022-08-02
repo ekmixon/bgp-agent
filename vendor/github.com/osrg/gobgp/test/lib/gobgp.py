@@ -42,10 +42,7 @@ from lib.base import (
 
 
 def extract_path_attribute(path, typ):
-    for a in path['attrs']:
-        if a['type'] == typ:
-            return a
-    return None
+    return next((a for a in path['attrs'] if a['type'] == typ), None)
 
 
 class GoBGPContainer(BGPContainer):
@@ -136,29 +133,41 @@ class GoBGPContainer(BGPContainer):
     @staticmethod
     def _get_nexthop(path):
         for p in path['attrs']:
-            if p['type'] == BGP_ATTR_TYPE_NEXT_HOP or p['type'] == BGP_ATTR_TYPE_MP_REACH_NLRI:
+            if p['type'] in [BGP_ATTR_TYPE_NEXT_HOP, BGP_ATTR_TYPE_MP_REACH_NLRI]:
                 return p['nexthop']
 
     @staticmethod
     def _get_local_pref(path):
-        for p in path['attrs']:
-            if p['type'] == BGP_ATTR_TYPE_LOCAL_PREF:
-                return p['value']
-        return None
+        return next(
+            (
+                p['value']
+                for p in path['attrs']
+                if p['type'] == BGP_ATTR_TYPE_LOCAL_PREF
+            ),
+            None,
+        )
 
     @staticmethod
     def _get_med(path):
-        for p in path['attrs']:
-            if p['type'] == BGP_ATTR_TYPE_MULTI_EXIT_DISC:
-                return p['metric']
-        return None
+        return next(
+            (
+                p['metric']
+                for p in path['attrs']
+                if p['type'] == BGP_ATTR_TYPE_MULTI_EXIT_DISC
+            ),
+            None,
+        )
 
     @staticmethod
     def _get_community(path):
-        for p in path['attrs']:
-            if p['type'] == BGP_ATTR_TYPE_COMMUNITIES:
-                return [community_str(c) for c in p['communities']]
-        return None
+        return next(
+            (
+                [community_str(c) for c in p['communities']]
+                for p in path['attrs']
+                if p['type'] == BGP_ATTR_TYPE_COMMUNITIES
+            ),
+            None,
+        )
 
     def _get_rib(self, dests_dict):
         dests = []
@@ -170,8 +179,7 @@ class GoBGPContainer(BGPContainer):
                 p["community"] = self._get_community(p)
                 p["med"] = self._get_med(p)
                 p["prefix"] = k
-                path_id = p.get("id", None)
-                if path_id:
+                if path_id := p.get("id", None):
                     p["identifier"] = p["id"]
             dests.append({'paths': v, 'prefix': k})
         return dests
@@ -506,7 +514,7 @@ class GoBGPContainer(BGPContainer):
             cmd = '/usr/bin/pkill {0} -SIGHUP'.format(d)
             self.local(cmd)
         for v in chain.from_iterable(self.routes.itervalues()):
-            if v['rf'] == 'ipv4' or v['rf'] == 'ipv6':
+            if v['rf'] in ['ipv4', 'ipv6']:
                 r = CmdBuffer(' ')
                 r << 'gobgp global -a {0}'.format(v['rf'])
                 r << 'rib add {0}'.format(v['prefix'])
@@ -523,9 +531,9 @@ class GoBGPContainer(BGPContainer):
                         ','.join(v['community'])
                         if isinstance(v['community'], (list, tuple)) else v['community'])
                 cmd = str(r)
-            elif v['rf'] == 'ipv4-flowspec' or v['rf'] == 'ipv6-flowspec':
+            elif v['rf'] in ['ipv4-flowspec', 'ipv6-flowspec']:
                 cmd = 'gobgp global '\
-                      'rib add match {0} then {1} -a {2}'.format(' '.join(v['matchs']), ' '.join(v['thens']), v['rf'])
+                          'rib add match {0} then {1} -a {2}'.format(' '.join(v['matchs']), ' '.join(v['thens']), v['rf'])
             else:
                 raise Exception('unsupported route faily: {0}'.format(v['rf']))
             self.local(cmd)

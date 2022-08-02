@@ -49,7 +49,7 @@ class GoBGPTestBase(unittest.TestCase):
         def f(ifname, ctn):
             out = ctn.local('ip -6 n', capture=True)
             l = [line for line in out.split('\n') if ifname in line]
-            if len(l) == 0:
+            if not l:
                 return False
             elif len(l) > 1:
                 raise Exception('not p2p link')

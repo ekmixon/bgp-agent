@@ -39,10 +39,7 @@ def get_mac_mobility_sequence(pattr):
             if 'type' in p and p['type'] == BGP_ATTR_TYPE_EXTENDED_COMMUNITIES]:
         for ec in [e for e in ecs if 'type' in e and e['type'] == 6]:
             if ec['subtype'] == 0:
-                if 'sequence' not in ec:
-                    return 0
-                else:
-                    return ec['sequence']
+                return 0 if 'sequence' not in ec else ec['sequence']
     return -1
 
 
@@ -90,7 +87,7 @@ class GoBGPTestBase(unittest.TestCase):
         self.assertTrue(path['nexthop'] == '0.0.0.0')
 
         interval = 1
-        timeout = int(30 / interval)
+        timeout = 30 // interval
         done = False
         for _ in range(timeout):
             if done:

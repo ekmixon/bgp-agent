@@ -106,8 +106,7 @@ class GoBGPTestBase(unittest.TestCase):
         self.assertEqual(len(rib), 1)
         self.assertEqual(len(rib[0]['paths']), 2)
         for path in rib[0]['paths']:
-            self.assertTrue(path['aspath'] == [100, 200, 300] or
-                            path['aspath'] == [100, 200])
+            self.assertTrue(path['aspath'] in [[100, 200, 300], [100, 200]])
 
     # test the best path is replaced due to the removal from g1 rib
     def test_07_check_g2_global_rib(self):
@@ -122,8 +121,7 @@ class GoBGPTestBase(unittest.TestCase):
         self.assertEqual(len(rib), 1)
         self.assertEqual(len(rib[0]['paths']), 2)
         for path in rib[0]['paths']:
-            self.assertTrue(path['aspath'] == [100, 200, 300] or
-                            path['aspath'] == [100, 200])
+            self.assertTrue(path['aspath'] in [[100, 200, 300], [100, 200]])
 
     # install a route with path_id via GoBGP CLI (no error check)
     def test_09_install_add_paths_route_via_cli(self):
@@ -137,9 +135,7 @@ class GoBGPTestBase(unittest.TestCase):
         self.assertEqual(len(rib), 1)
         self.assertEqual(len(rib[0]['paths']), 3)
         for path in rib[0]['paths']:
-            self.assertTrue(path['aspath'] == [100, 200, 300] or
-                            path['aspath'] == [100, 200] or
-                            path['aspath'] == [])
+            self.assertTrue(path['aspath'] in [[100, 200, 300], [100, 200], []])
             if len(path['aspath']) == 0:
                 self.assertEqual(path['local-pref'], 500)
 
@@ -156,9 +152,7 @@ class GoBGPTestBase(unittest.TestCase):
         self.assertEqual(len(rib), 1)
         self.assertEqual(len(rib[0]['paths']), 3)
         for path in rib[0]['paths']:
-            self.assertTrue(path['aspath'] == [100, 200, 300] or
-                            path['aspath'] == [100, 200] or
-                            path['aspath'] == [])
+            self.assertTrue(path['aspath'] in [[100, 200, 300], [100, 200], []])
             if len(path['aspath']) == 0:
                 self.assertEqual(path['local-pref'], 500)
 
@@ -175,9 +169,7 @@ class GoBGPTestBase(unittest.TestCase):
         self.assertEqual(len(rib), 1)
         self.assertEqual(len(rib[0]['paths']), 3)
         for path in rib[0]['paths']:
-            self.assertTrue(path['aspath'] == [100, 200, 300] or
-                            path['aspath'] == [100, 200] or
-                            path['aspath'] == [])
+            self.assertTrue(path['aspath'] in [[100, 200, 300], [100, 200], []])
             if len(path['aspath']) == 0:
                 self.assertEqual(path['local-pref'], 500)
 
@@ -192,8 +184,7 @@ class GoBGPTestBase(unittest.TestCase):
         self.assertEqual(len(rib), 1)
         self.assertEqual(len(rib[0]['paths']), 2)
         for path in rib[0]['paths']:
-            self.assertTrue(path['aspath'] == [100, 200, 300] or
-                            path['aspath'] == [100, 200])
+            self.assertTrue(path['aspath'] in [[100, 200, 300], [100, 200]])
 
     # test the best path is replaced the removal from g1 rib
     def test_17_check_g2_global_rib(self):
@@ -208,8 +199,7 @@ class GoBGPTestBase(unittest.TestCase):
         self.assertEqual(len(rib), 1)
         self.assertEqual(len(rib[0]['paths']), 2)
         for path in rib[0]['paths']:
-            self.assertTrue(path['aspath'] == [100, 200, 300] or
-                            path['aspath'] == [100, 200])
+            self.assertTrue(path['aspath'] in [[100, 200, 300], [100, 200]])
 
 
 if __name__ == '__main__':

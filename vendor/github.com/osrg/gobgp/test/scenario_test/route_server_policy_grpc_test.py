@@ -52,10 +52,10 @@ def register_scenario(cls):
 
 
 def lookup_scenario(name):
-    for value in _SCENARIOS.values():
-        if value.__name__ == name:
-            return value
-    return None
+    return next(
+        (value for value in _SCENARIOS.values() if value.__name__ == name),
+        None,
+    )
 
 
 def wait_for(f, timeout=120):
@@ -1194,10 +1194,10 @@ class ImportPolicyCommunityRegexp(object):
 def community_exists(path, com):
     a, b = com.split(':')
     com = (int(a) << 16) + int(b)
-    for a in path['attrs']:
-        if a['type'] == BGP_ATTR_TYPE_COMMUNITIES and com in a['communities']:
-            return True
-    return False
+    return any(
+        a['type'] == BGP_ATTR_TYPE_COMMUNITIES and com in a['communities']
+        for a in path['attrs']
+    )
 
 
 @register_scenario
@@ -1753,10 +1753,7 @@ class ExportPolicyCommunityNull(object):
 
 
 def metric(path):
-    for a in path['attrs']:
-        if 'metric' in a:
-            return a['metric']
-    return -1
+    return next((a['metric'] for a in path['attrs'] if 'metric' in a), -1)
 
 
 @register_scenario

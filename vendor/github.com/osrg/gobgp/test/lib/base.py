@@ -145,8 +145,8 @@ class Bridge(object):
             self.subnet = netaddr.IPNetwork(subnet)
 
             def _f():
-                for host in self.subnet:
-                    yield host
+                yield from self.subnet
+
             self._ip_generator = _f()
             # throw away first network address
             self.next_ip_address()
@@ -158,6 +158,7 @@ class Bridge(object):
             if self.subnet.version == 6:
                 v6 = '--ipv6'
             self.id = local('docker network create --driver bridge {0} --subnet {1} {2}'.format(v6, subnet, self.name), capture=True)
+
         try_several_times(f)
 
         self.self_ip = self_ip
@@ -175,10 +176,7 @@ class Bridge(object):
         self.ctns.append(ctn)
         local("docker network connect {0} {1}".format(self.name, ctn.docker_name()))
         i = [x for x in Client(timeout=60, version='auto').inspect_network(self.id)['Containers'].values() if x['Name'] == ctn.docker_name()][0]
-        if self.subnet.version == 4:
-            addr = i['IPv4Address']
-        else:
-            addr = i['IPv6Address']
+        addr = i['IPv4Address'] if self.subnet.version == 4 else i['IPv6Address']
         ctn.ip_addrs.append(('eth1', addr, self.name))
 
     def delete(self):
@@ -228,12 +226,18 @@ class Container(object):
         return 0
 
     def stop(self):
-        ret = try_several_times(lambda: local("docker stop -t 0 " + self.docker_name(), capture=True))
+        ret = try_several_times(
+            lambda: local(f"docker stop -t 0 {self.docker_name()}", capture=True)
+        )
+
         self.is_running = False
         return ret
 
     def remove(self):
-        ret = try_several_times(lambda: local("docker rm -f " + self.docker_name(), capture=True))
+        ret = try_several_times(
+            lambda: local(f"docker rm -f {self.docker_name()}", capture=True)
+        )
+
         self.is_running = False
         return ret
 
@@ -336,7 +340,7 @@ class BGPContainer(Container):
 
         if interface == '':
             for me, you in it:
-                if bridge != '' and bridge != me[2]:
+                if bridge not in ['', me[2]]:
                     continue
                 if me[2] == you[2]:
                     neigh_addr = you[1]
@@ -474,8 +478,8 @@ class BGPContainer(Container):
         count = 0
         while True:
             res = self.local(cmd, capture=True)
-            print colors.yellow(res)
-            if '1 packets received' in res and '0% packet loss':
+            res = self.local(cmd, capture=True)
+            if '1 packets received' in res:
                 break
             time.sleep(interval)
             count += interval

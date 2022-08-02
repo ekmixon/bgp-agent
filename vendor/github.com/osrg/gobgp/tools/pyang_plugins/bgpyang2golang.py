@@ -129,10 +129,7 @@ def check_module_deps(ctx, mod):
 
 def dig_leafref(type_obj):
     reftype = type_obj.i_type_spec.i_target_node.search_one('type')
-    if is_leafref(reftype):
-        return dig_leafref(reftype)
-    else:
-        return reftype
+    return dig_leafref(reftype) if is_leafref(reftype) else reftype
 
 
 def emit_class_def(ctx, stmt, struct_name, prefix, fd):

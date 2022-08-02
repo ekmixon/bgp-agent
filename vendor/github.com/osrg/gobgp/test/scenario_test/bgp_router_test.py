@@ -84,11 +84,11 @@ class GoBGPTestBase(unittest.TestCase):
             self.gobgp.wait_for(expected_state=BGP_FSM_ESTABLISHED, peer=q)
 
     def test_02_check_gobgp_global_rib(self):
+        timeout = 120
+        interval = 1
         for q in self.quaggas.itervalues():
             # paths expected to exist in gobgp's global rib
             routes = q.routes.keys()
-            timeout = 120
-            interval = 1
             count = 0
 
             while True:
@@ -119,7 +119,7 @@ class GoBGPTestBase(unittest.TestCase):
     # check routes are properly advertised to all BGP speaker
     def test_04_check_quagga_global_rib(self):
         interval = 1
-        timeout = int(120 / interval)
+        timeout = 120 // interval
         for q in self.quaggas.itervalues():
             done = False
             for _ in range(timeout):

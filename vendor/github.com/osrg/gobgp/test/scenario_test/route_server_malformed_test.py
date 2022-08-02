@@ -42,10 +42,10 @@ def register_scenario(cls):
 
 
 def lookup_scenario(name):
-    for value in _SCENARIOS.values():
-        if value.__name__ == name:
-            return value
-    return None
+    return next(
+        (value for value in _SCENARIOS.values() if value.__name__ == name),
+        None,
+    )
 
 
 def wait_for(f, timeout=120):
@@ -538,8 +538,7 @@ class TestGoBGPBase(unittest.TestCase):
             cls.executors.append(cls.executor)
 
     def test(self):
-        for e in self.executors:
-            yield e
+        yield from self.executors
 
 
 if __name__ == '__main__':

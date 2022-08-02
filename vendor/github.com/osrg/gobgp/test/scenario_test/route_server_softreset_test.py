@@ -54,9 +54,7 @@ class GoBGPTestBase(unittest.TestCase):
         ctns = [g1, g2, g3, g4]
 
         # advertise a route from route-server-clients
-        cls.clients = {}
-        for cli in [g2, g3, g4]:
-            cls.clients[cli.name] = cli
+        cls.clients = {cli.name: cli for cli in [g2, g3, g4]}
         initial_wait_time = max(ctn.run() for ctn in ctns)
 
         time.sleep(initial_wait_time)
